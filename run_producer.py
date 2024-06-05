@@ -80,7 +80,7 @@ def run_producer(server = {"server": None, "port": None}, shared_id = None):
     config = {
         "mode": "mbm-local-remote", ## local:"cj-local-remote" remote "mbm-local-remote"
         "server-port": server["port"] if server["port"] else "6666", ## local: 6667, remote 6666
-        "server": server["server"] if server["server"] else "login01.cluster.zalf.de",
+        "server": server["server"] if server["server"] else "localhost",  # "login01.cluster.zalf.de",
         "start-row": "0", 
         "end-row": "-1", 
         "path_to_dem_grid": "",
@@ -284,7 +284,7 @@ def run_producer(server = {"server": None, "port": None}, shared_id = None):
                             c_lat, c_lon = rowcol_to_latlon[c_row_col]
                         else:
                             continue
-                        sr, sh = trans.transform(c_lat, c_lon)
+                        sr, sh = trans.transform(c_lon, c_lat)
                         yield sr, sh, file
 
         soil_id_cache = {}
@@ -576,14 +576,6 @@ def run_producer(server = {"server": None, "port": None}, shared_id = None):
                 "nodata": False
             }
 
-            print("Harvest type:", setup["harvest-date"])
-            print("Srow: ", env_template["customId"]["srow"], "Scol:", env_template["customId"]["scol"])
-            harvest_ws = next(filter(lambda ws: ws["type"][-7:] == "Harvest", env_template["cropRotation"][0]["worksteps"]))
-            if setup["harvest-date"] == "fixed":
-                print("Harvest-date:", harvest_ws["date"])
-            elif setup["harvest-date"] == "auto":
-                print("Harvest-date:", harvest_ws["latest-date"])
-
             if not DEBUG_DONOT_SEND :
                 socket.send_json(env_template)
                 print("sent env ", sent_env_count, " customId: ", env_template["customId"])
@@ -595,7 +587,7 @@ def run_producer(server = {"server": None, "port": None}, shared_id = None):
                 debug_write_folder = paths["path-debug-write-folder"]
                 if not os.path.exists(debug_write_folder):
                     os.makedirs(debug_write_folder)
-                if sent_env_count < DEBUG_ROWS  :
+                if sent_env_count < DEBUG_ROWS:
 
                     path_to_debug_file = debug_write_folder + "/row_" + str(sent_env_count-1) + "_" + str(setup_id) + ".json"
 

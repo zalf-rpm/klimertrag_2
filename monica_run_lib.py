@@ -119,7 +119,7 @@ def get_value(list_or_value):
 
 
 def create_seed_harvest_geoGrid_interpolator_and_read_data(path_to_csv_file, worldGeodeticSys84, geoTargetGrid, ilr_seed_harvest_data):
-    "read seed/harvest dates and apoint climate stations"
+    """read seed/harvest dates and apoint climate stations"""
 
     wintercrop = {
         "WW": True,
@@ -145,8 +145,8 @@ def create_seed_harvest_geoGrid_interpolator_and_read_data(path_to_csv_file, wor
         # skip header line
         next(reader)
 
-        points = [] # climate station position (lat, long transformed to a geoTargetGrid, e.g gk5)
-        values = [] # climate station ids
+        points = []  # climate station position (lat, long transformed to a geoTargetGrid, e.g gk5)
+        values = []  # climate station ids
 
         transformer = Transformer.from_crs(worldGeodeticSys84, geoTargetGrid, always_xy=True) 
 
