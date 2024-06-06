@@ -38,6 +38,7 @@ import grid_capnp
 import soil_capnp
 import fbp_capnp
 import model_capnp
+import common_capnp
 
 PATHS = {
      # adjust the local path to your environment
@@ -62,19 +63,6 @@ TEMPLATE_PATH_LATLON = "{path_to_climate_dir}/latlon-to-rowcol.json"
 TEMPLATE_PATH_CLIMATE_CSV = "{gcm}/{rcm}/{scenario}/{ensmem}/{version}/row-{crow}/col-{ccol}.csv"
 TEMPLATE_PATH_HARVEST = "{path_to_data_dir}/projects/monica-germany/ILR_SEED_HARVEST_doys_{crop_id}.csv"
 
-#def start_grid_service(path_to_python, path_to_grid, port, srt, grid_crs="utm32n", val_type="float"):
-#    p = sp.Popen([
-#        path_to_python,
-#        "-m",
-#        "zalfmas_services.grid.ascii_grid",
-#        f"path_to_ascii_grid={path_to_grid}",
-#        f"grid_crs={grid_crs}",
-#        f"val_type={val_type}",
-#        f"port={port}",
-#        f"srt={srt}",
-#    ])
-#    return p
-
 
 async def run_producer(server=None, port=None):
     local_run = True
@@ -91,7 +79,6 @@ async def run_producer(server=None, port=None):
         "site.json": "site.json",
         "setups-file": "sim_setups.csv",
         "run-setups": "[1]",
-        "path_to_python": "/home/berg/miniconda3/envs/klimertrag_2/bin/python" if local_run else "/home/rpm/.conda/envs/clim4cast/bin/python",
     }
 
     common.update_config(config, sys.argv, print_config=True, allow_new_keys=False)
@@ -105,32 +92,12 @@ async def run_producer(server=None, port=None):
     print("read sim setups: ", config["setups-file"])
 
     #transforms geospatial coordinates from one coordinate reference system to another
-    # transform wgs84 into gk5
-    soil_crs_to_x_transformers = {}
     wgs84_crs = CRS.from_epsg(4326)
     utm32_crs = CRS.from_epsg(25832)
     wgs84_to_utm32_trans = Transformer.from_crs(wgs84_crs, utm32_crs, always_xy=True)
 
     ilr_seed_harvest_data = defaultdict(lambda: {"interpolate": None, "data": defaultdict(dict),
                                                  "is-winter-crop": None})
-
-    #procs = []
-    #procs.append(start_grid_service(config["path_to_python"],
-    #                                Path(paths['path-to-data-dir']) / 'germany' / 'dem_1000_25832_etrs89-utm32n.asc',
-    #                                port=9902, srt="dem", grid_crs="utm32n", val_type="float"))
-    #procs.append(start_grid_service(config["path_to_python"],
-    #                                Path(paths['path-to-data-dir']) / 'germany' / 'slope_1000_25832_etrs89-utm32n.asc',
-    #                                port=9903, srt="slope", grid_crs="utm32n", val_type="float"))
-    #procs.append(sp.Popen([
-    #    config["path_to_python"],
-    #    "-m",
-    #    "zalfmas_services.soil.sqlite_soil_data_service",
-    #    f"path_to_sqlite_db={Path(paths['path-to-data-dir']) / 'germany' / 'buek200.sqlite'}",
-    #    f"path_to_ascii_soil_grid={Path(paths['path-to-data-dir']) / 'germany' / 'buek200_1000_25832_etrs89-utm32n.asc'}",
-    #    f"grid_crs=utm32n",
-    #    f"port={9901}",
-    #    f"srt=soil",
-    #]))
 
     conman = common.ConnectionManager()
     soil_service = await conman.try_connect("capnp://localhost:9901/soil", cast_as=soil_capnp.Service, retry_secs=1)
@@ -452,28 +419,23 @@ async def run_producer(server=None, port=None):
                 "nodata": False
             }
 
-            out_ip = fbp_capnp.IP.new_message(
-                content=model_capnp.Env.new_message(
-                    rest=json.dumps(env_template),
-                    soilProfile=soil_profiles_.profiles[0]))
+            capnp_env = model_capnp.Env.new_message()
+            # capnp_env.timeSeries = timeseries
+            capnp_env.soilProfile = soil_profiles_.profiles[0]
+            capnp_env.rest = common_capnp.StructuredText.new_message(value=json.dumps(env_template),
+                                                                     structure={"json": None})
+            out_ip = fbp_capnp.IP.new_message(content=capnp_env,
+                                              attributes=[{"key": "id", "value": common_capnp.Value(ui8=1)}])
+            #out_ip = fbp_capnp.IP.new_message(
+            #    content=model_capnp.Env.new_message(
+            #        rest={"value": json.dumps(env_template), "structure": {"json": None}},
+            #        soilProfile=soil_profiles_.profiles[0]))
             await monica_in.write(value=out_ip)
             print("sent env ", sent_env_count, " customId: ", env_template["customId"])
             sent_env_count += 1
 
         stop_setup_time = time.perf_counter()
-        print("Setup ", (sent_env_count-1), " envs took ", (stop_setup_time - start_setup_time), " seconds")
-
-    stop_time = time.perf_counter()
-
-    try:
-        print("sending ", (sent_env_count-1), " envs took ", (stop_time - start_time), " seconds")
-        #print("ran from ", start, "/", row_cols[start], " to ", end, "/", row_cols[end]
-        print("exiting run_producer()")
-    except Exception:
-        raise
-
-    for proc in procs:
-        proc.terminate()
+        print(f"Sending {sent_env_count} envs for setup {setup_id} took {stop_setup_time - start_setup_time} seconds")
 
 
 if __name__ == "__main__":
