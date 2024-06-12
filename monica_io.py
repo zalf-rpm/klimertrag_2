@@ -12,18 +12,11 @@
 # Landscape Systems Analysis at the ZALF.
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
-import os
-import time
 import json
+import os
+from pathlib import Path
 import sys
-
-import soil_io3
-#import monica_python
-#print("path to monica_python: ", monica_python.__file__)
-
-#print("sys.version: ", sys.version)
-
-print("local monica_io3.py")
+from zalfmas_common.soil import soil_io
 
 CACHE_REFS = False
 
@@ -150,8 +143,10 @@ def write_output_header_rows(output_ids,
     return out
 
 
-def write_output(output_ids, values, round_ids={}):
-    "write actual output lines"
+def write_output(output_ids, values, round_ids=None):
+    """write actual output lines"""
+    if round_ids is None:
+        round_ids = {}
     out = []
     if len(values) > 0:
         for k in range(0, len(values[0])):
@@ -167,6 +162,23 @@ def write_output(output_ids, values, round_ids={}):
                     row.append(round(j__, round_ids[oid_name]) if oid_name in round_ids else j__)
                 i += 1
             out.append(row)
+    return out
+
+
+def write_output_obj(output_ids, values, round_ids={}):
+    "write actual output lines"
+    out = []
+    for obj in values:
+        row = []
+        for oid in output_ids:
+            oid_name = oid["displayName"] if len(oid["displayName"]) > 0 else oid["name"]
+            j__ = obj.get(oid_name, "")
+            if isinstance(j__, list):
+                for jv_ in j__:
+                    row.append(round(jv_, round_ids[oid_name]) if oid_name in round_ids else jv_)
+            else:
+                row.append(round(j__, round_ids[oid_name]) if oid_name in round_ids else j__)
+        out.append(row)
     return out
 
 
@@ -217,11 +229,13 @@ def default_value(dic, key, default):
 
 
 def read_and_parse_json_file(path):
-    with open(path) as f:
-        return {"result": json.load(f), "errors": [], "success": True}
-    return {"result": {},
-            "errors": ["Error opening file with path : '" + path + "'!"],
-            "success": False}
+    try:
+        with open(path) as f:
+            return {"result": json.load(f), "errors": [], "success": True}
+    except:
+        return {"result": {},
+                "errors": ["Error opening file with path : '" + path + "'!"],
+                "success": False}
 
 
 def parse_json_string(jsonString):

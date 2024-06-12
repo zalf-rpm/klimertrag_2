@@ -4,8 +4,8 @@
 	"climate.csv": "",
 
 	"climate.csv-options": {
-        "no-of-climate-file-header-lines": 2,
-        "csv-separator": ";",
+        "no-of-climate-file-header-lines": 1,
+        "csv-separator": ",",
         "header-to-acd-names": {}
     },
 	

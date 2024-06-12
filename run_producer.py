@@ -30,7 +30,7 @@ import sys
 import time
 import zmq
 
-import monica_io3
+import monica_io
 import soil_io3
 import monica_run_lib as Mrunlib
 
@@ -42,7 +42,7 @@ PATHS = {
         "monica-path-to-climate-dir": "/monica_data/climate-data/", # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/", # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
-        "path-to-100-climate-files": "/home/berg/Desktop/marlene/pr_output_csvs/"
+        "path-to-100-climate-files": "/home/berg/Desktop/marlene/pr_output_csvs_test/"
     },
     "remoteProducer-remoteMonica": {
         #"include-file-base-path": "/monica-parameters/", # path to monica-parameters
@@ -243,7 +243,7 @@ def run_producer(server = {"server": None, "port": None}, shared_id = None):
         crop_json["cropRotation"][2] = crop_id
 
         # create environment template from json templates
-        env_template = monica_io3.create_env_json_from_json_config({
+        env_template = monica_io.create_env_json_from_json_config({
             "crop": crop_json,
             "site": site_json,
             "sim": sim_json,
@@ -343,7 +343,7 @@ def run_producer(server = {"server": None, "port": None}, shared_id = None):
             harvest_ws = next(filter(lambda ws: ws["type"][-7:] == "Harvest", worksteps))
 
             ilr_interpolate = ilr_seed_harvest_data[crop_id_short]["interpolate"]
-            seed_harvest_cs = ilr_interpolate(sr, sh) if ilr_interpolate else None
+            seed_harvest_cs = int(ilr_interpolate(sr, sh)) if ilr_interpolate else None
 
             # set external seed/harvest dates
             if seed_harvest_cs:

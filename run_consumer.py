@@ -29,7 +29,7 @@ import timeit
 import types
 import zmq
 
-import monica_io3
+import monica_io
 import soil_io3
 import monica_run_lib as Mrunlib
 
@@ -234,16 +234,15 @@ def write_row_to_grids(row_col_data, row, ncols, header, path_to_output_dir, pat
         del row_col_data[row]
 
 
-def run_consumer(leave_after_finished_run = True, server = {"server": None, "port": None}, shared_id = None):
-    "collect data from workers"
+def run_consumer(leave_after_finished_run=True, server=None, port=None):
+    """collect data from workers"""
 
     config = {
         "mode": "mbm-local-remote",  ## remote "mbm-local-remote", local "cj-local-remote"
-        "port": server["port"] if server["port"] else "7777", ## local 7778,  remote 7777
-        "server": server["server"] if server["server"] else "localhost",  # "login01.cluster.zalf.de",
+        "port": port if port else "7777", ## local 7778,  remote 7777
+        "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "start-row": "0",
         "end-row": "-1",
-        "shared_id": shared_id,
         "timeout": 600000 # 10 minutes
     }
 
@@ -263,11 +262,7 @@ def run_consumer(leave_after_finished_run = True, server = {"server": None, "por
     print("consumer config:", config)
 
     context = zmq.Context()
-    if config["shared_id"]:
-        socket = context.socket(zmq.DEALER)
-        socket.setsockopt(zmq.IDENTITY, config["shared_id"])
-    else:
-        socket = context.socket(zmq.PULL)
+    socket = context.socket(zmq.PULL)
 
     socket.connect("tcp://" + config["server"] + ":" + config["port"])
     socket.RCVTIMEO = config["timeout"]
@@ -452,13 +447,13 @@ def run_consumer(leave_after_finished_run = True, server = {"server": None, "por
 
                     if len(results) > 0:
                         writer.writerow([orig_spec.replace("\"", "")])
-                        for row in monica_io3.write_output_header_rows(output_ids,
+                        for row in monica_io.write_output_header_rows(output_ids,
                                                                       include_header_row=True,
                                                                       include_units_row=True,
                                                                       include_time_agg=False):
                             writer.writerow(row)
 
-                        for row in monica_io3.write_output(output_ids, results):
+                        for row in monica_io.write_output_obj(output_ids, results):
                             writer.writerow(row)
 
                     writer.writerow([])
