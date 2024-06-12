@@ -16,6 +16,8 @@
 # Copyright (C: Leibniz Centre for Agricultural Landscape Research (ZALF)
 
 import asyncio
+import itertools
+
 import capnp
 from collections import defaultdict
 from datetime import date, timedelta
@@ -206,7 +208,7 @@ async def run_producer(server=None, port=None):
         soil_id_cache = {}
         sent_env_count = 0
         #for sr, sh, file_name in gen_all_row_cols():
-        for c_lat, c_lon, file_name in gen_100_files():
+        for c_lat, c_lon, file_name in itertools.islice(gen_100_files(), 10):
 
             c_latlon = {"lat": c_lat, "lon": c_lon}
             grid_res = [
@@ -386,7 +388,8 @@ async def run_producer(server=None, port=None):
             env_template["csvViaHeaderOptions"] = sim_json["climate.csv-options"]
 
             if file_name:
-                env_template["pathToClimateCSV"] = paths["path-to-100-climate-files"] + "/" + file_name
+                env_template["pathToClimateCSV"] = "/home/berg/GitHub/klimertrag_2/data/germany/col-181.csv"
+                #env_template["pathToClimateCSV"] = paths["path-to-100-climate-files"] + "/" + file_name
             else:
                 subpath_to_csv = TEMPLATE_PATH_CLIMATE_CSV.format(gcm=gcm, rcm=rcm, scenario=scenario, ensmem=ensmem, version=version, crow=str(crow), ccol=str(ccol))
                 for _ in range(4):

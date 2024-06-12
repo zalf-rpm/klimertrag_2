@@ -104,7 +104,7 @@ async def run_consumer(leave_after_finished_run=True, server=None, port=None):
                                                                    include_units_row=True,
                                                                    include_time_agg=False):
                         writer.writerow(row)
-                    for row in monica_io.write_output(output_ids, results):
+                    for row in monica_io.write_output_obj(output_ids, results):
                         writer.writerow(row)
                 writer.writerow([])
 
