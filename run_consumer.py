@@ -36,8 +36,8 @@ import monica_run_lib as Mrunlib
 PATHS = {
     "cj-local-remote": {
         "path-to-data-dir": "data/",
-        "path-to-output-dir": "D:/projects/KlimErtrag/out_remote_local/",
-        "path-to-csv-output-dir": "D:/projects/KlimErtrag/out_remote_local/"
+        "path-to-output-dir": "H:/Projekte/ModOKlim/Data/sensitivity_springDrought",
+        "path-to-csv-output-dir": "H:/Projekte/ModOKlim/Data/sensitivity_springDrought"
     },
     "mbm-local-remote": {
         "path-to-data-dir": "data/",
