@@ -6,7 +6,15 @@
 	"climate.csv-options": {
         "no-of-climate-file-header-lines": 1,
         "csv-separator": ",",
-        "header-to-acd-names": {}
+        "header-to-acd-names": {
+			"\"iso-date\"": "iso-date",
+			"\"tmin\"": "tmin",
+			"\"tmax\"": "tmax",
+			"\"wind\"": "wind",
+			"\"globrad\"": "globrad",
+			"\"precip\"": "precip",
+			"\"relhumid\"": "relhumid"
+		}
     },
 	
 	"debug?": false,

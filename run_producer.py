@@ -42,7 +42,7 @@ PATHS = {
         "monica-path-to-climate-dir": "/monica_data/climate-data/", # mounted path to archive accessable by monica executable
         "path-to-data-dir": "./data/", # mounted path to archive or hard drive with data
         "path-debug-write-folder": "./debug-out/",
-        "path-to-100-climate-files": "/home/berg/Desktop/marlene/pr_output_csvs_test/"
+        "path-to-100-climate-files": "/home/berg/Desktop/marlene/pr_output_csvs/"
     },
     "remoteProducer-remoteMonica": {
         #"include-file-base-path": "/monica-parameters/", # path to monica-parameters

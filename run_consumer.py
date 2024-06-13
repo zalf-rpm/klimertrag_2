@@ -243,7 +243,7 @@ def run_consumer(leave_after_finished_run=True, server=None, port=None):
         "server": server if server else "localhost",  # "login01.cluster.zalf.de",
         "start-row": "0",
         "end-row": "-1",
-        "timeout": 600000 # 10 minutes
+        "timeout": 30000 # 10 minutes
     }
 
     if len(sys.argv) > 1 and __name__ == "__main__":
@@ -427,7 +427,7 @@ def run_consumer(leave_after_finished_run=True, server=None, port=None):
             
             process_message.wnof_count += 1
 
-            path_to_out_dir = config["out"] + str(setup_id) + "/crow-" + str(crow) + "/"
+            path_to_out_dir = config["out"] + str(setup_id)
             print(path_to_out_dir)
             if not os.path.exists(path_to_out_dir):
                 try:
@@ -437,7 +437,7 @@ def run_consumer(leave_after_finished_run=True, server=None, port=None):
                     exit(1)
 
             #with open("out/out-" + str(i) + ".csv", 'wb') as _:
-            with open(path_to_out_dir + "ccol-" + str(ccol) + ".csv", "w", newline='') as _:
+            with open(f"{path_to_out_dir}/crow-{crow}_ccol-{ccol}.csv", "w", newline='') as _:
 
                 writer = csv.writer(_, delimiter=",")
                 for data_ in msg.get("data", []):
