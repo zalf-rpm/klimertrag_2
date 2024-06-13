@@ -75,7 +75,7 @@ TEMPLATE_PATH_CLIMATE_CSV = "{gcm}/{rcm}/{scenario}/{ensmem}/{version}/row-{crow
 TEMPLATE_PATH_HARVEST = "{path_to_data_dir}/projects/monica-germany/ILR_SEED_HARVEST_doys_{crop_id}.csv"
 
 DEBUG_DONOT_SEND = False
-DEBUG_WRITE = False
+DEBUG_WRITE = True
 DEBUG_ROWS = 10
 DEBUG_WRITE_FOLDER = "./debug_out"
 DEBUG_WRITE_CLIMATE = False
@@ -597,7 +597,7 @@ def run_producer(server = {"server": None, "port": None}, shared_id = None):
                     os.makedirs(debug_write_folder)
                 if sent_env_count < DEBUG_ROWS:
 
-                    path_to_debug_file = debug_write_folder + "/row_" + str(sent_env_count-1) + "_" + str(setup_id) + ".json"
+                    path_to_debug_file = f"{debug_write_folder}/sid-{setup_id}_crow-{crow}_ccol-{ccol}.json"
 
                     if not os.path.isfile(path_to_debug_file):
                         with open(path_to_debug_file, "w") as _ :
