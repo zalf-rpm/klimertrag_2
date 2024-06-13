@@ -75,7 +75,7 @@ TEMPLATE_PATH_CLIMATE_CSV = "{gcm}/{rcm}/{scenario}/{ensmem}/{version}/row-{crow
 TEMPLATE_PATH_HARVEST = "{path_to_data_dir}/projects/monica-germany/ILR_SEED_HARVEST_doys_{crop_id}.csv"
 
 DEBUG_DONOT_SEND = False
-DEBUG_WRITE = True
+DEBUG_WRITE = False
 DEBUG_ROWS = 10
 DEBUG_WRITE_FOLDER = "./debug_out"
 DEBUG_WRITE_CLIMATE = False
