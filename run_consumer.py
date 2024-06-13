@@ -30,7 +30,7 @@ import types
 import zmq
 
 import monica_io
-import soil_io3
+import soil_io
 import monica_run_lib as Mrunlib
 
 PATHS = {

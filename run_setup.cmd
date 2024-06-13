@@ -1,4 +1,5 @@
-set PATH_TO_MONICA_BIN_DIR=C:\MONICA\monica_win64_3.6.16\bin
+rem set PATH_TO_MONICA_BIN_DIR=C:\MONICA\monica_win64_3.6.16\bin
+set PATH_TO_MONICA_BIN_DIR=C:\Users\palka\GitHub\monica\_cmake_win64\Release
 set PATH_TO_PYTHON=c:\Users\palka\AppData\Local\anaconda3\python.exe
 set MONICA_PARAMETERS=%cd%\data\params
 echo "MONICA_PARAMETERS=%MONICA_PARAMETERS%"
@@ -13,10 +14,10 @@ START "ZMQ_MONICA_4" /MIN %PATH_TO_MONICA_BIN_DIR%\monica-zmq-server -ci -i tcp:
 START "ZMQ_MONICA_5" /MIN %PATH_TO_MONICA_BIN_DIR%\monica-zmq-server -ci -i tcp://localhost:6677 -co -o tcp://localhost:7788
 
 echo "run producer"
-START "ZMQ_PRODUCER" /MIN %PATH_TO_PYTHON% run-producer.py
+START "ZMQ_PRODUCER" /MIN %PATH_TO_PYTHON% run_producer.py
 
 echo "run consumer"
-%PATH_TO_PYTHON% run-consumer.py
+%PATH_TO_PYTHON% run_consumer.py
 
 echo "killing proxies"
 taskkill /FI "WindowTitle eq ZMQ_IN_PROXY*" /T /F

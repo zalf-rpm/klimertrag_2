@@ -29,7 +29,7 @@ import sys
 import time
 
 import monica_io3
-import soil_io3
+import soil_io
 import monica_run_lib as Mrunlib
 
 from zalfmas_common import common
